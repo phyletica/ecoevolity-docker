@@ -18,3 +18,7 @@ RUN pip install git+git://github.com/phyletica/pycoevolity.git
 
 # Download example data and config file
 RUN git clone https://github.com/phyletica/ecoevolity-example-data.git
+
+# Check to see if everything is installed
+RUN ecoevolity -h
+RUN pyco-sumtimes -h
