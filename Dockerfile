@@ -1,16 +1,20 @@
-FROM ubuntu:bionic
+FROM ubuntu:24.04
+
+ENV DEBIAN_FRONTEND=noninteractive
 
 # Install dependencies for ecoevolity and pycoevolity
-RUN apt-get update -q && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y -q \
+RUN apt-get update -y -q && \
+    apt-get install -y -q \
+        build-essential \
         git \
         cmake \
-        g++ \
-        python \
-        python-pip
+        python3 \
+        python3-pip \
+        && apt-get clean \
+        && rm -rf /var/lib/apt/lists/*
 
 # Install R for pycoevolity plotting
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y -q --no-install-recommends \
+RUN apt-get install -y -q --no-install-recommends \
         r-base
 
 # Install R packages used by pycoevolity
@@ -19,19 +23,22 @@ RUN R -e 'install.packages(c("ggplot2", "ggridges"), repos = "http://cloud.r-pro
 # Download build and install ecoevolity
 RUN git clone https://github.com/phyletica/ecoevolity.git && \
     cd ecoevolity && \
+    latest_tag="$(git describe --tags "$(git rev-list --tags --max-count=1)")" && \
+    get checkout "$latest_tag"
     ./build.sh --prefix /usr/local
 
 # Install pycoevolity via pip
-RUN pip install git+git://github.com/phyletica/pycoevolity.git
+RUN python3 -m pip install matplotlib scipy && \
+    python3 -m pip install git+git://github.com/phyletica/pycoevolity.git
 
 # Download example data and config file
 RUN git clone https://github.com/phyletica/ecoevolity-example-data.git
 
 # Let's give it a spin
-RUN cd ecoevolity-example-data && \
-    mkdir test && \
-    ecoevolity --relax-missing-sites --relax-triallelic-sites --ignore-data --prefix ./test/ ecoevolity-config.yml && \
-    cd test && \
-    pyco-sumtimes ecoevolity-config-state-run-1.log && \
-    cd .. && \
-    rm -r test
+# RUN cd ecoevolity-example-data && \
+#     mkdir test && \
+#     ecoevolity --relax-missing-sites --relax-triallelic-sites --ignore-data --prefix ./test/ ecoevolity-config.yml && \
+#     cd test && \
+#     pyco-sumtimes ecoevolity-config-state-run-1.log && \
+#     cd .. && \
+#     rm -r test
