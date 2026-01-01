@@ -10,8 +10,9 @@ RUN apt-get update -y -q && \
         cmake \
         python3 \
         python3-pip \
-        && apt-get clean \
-        && rm -rf /var/lib/apt/lists/*
+        python3-scipy \
+        python3-matplotlib \
+        python3-munkres
 
 # Install R for pycoevolity plotting
 RUN apt-get install -y -q --no-install-recommends \
@@ -24,12 +25,11 @@ RUN R -e 'install.packages(c("ggplot2", "ggridges"), repos = "http://cloud.r-pro
 RUN git clone https://github.com/phyletica/ecoevolity.git && \
     cd ecoevolity && \
     latest_tag="$(git describe --tags "$(git rev-list --tags --max-count=1)")" && \
-    get checkout "$latest_tag"
+    git checkout "$latest_tag" && \
     ./build.sh --prefix /usr/local
 
 # Install pycoevolity via pip
-RUN python3 -m pip install matplotlib scipy && \
-    python3 -m pip install git+git://github.com/phyletica/pycoevolity.git
+RUN python3 -m pip install --break-system-packages git+https://github.com/phyletica/pycoevolity.git
 
 # Download example data and config file
 RUN git clone https://github.com/phyletica/ecoevolity-example-data.git
