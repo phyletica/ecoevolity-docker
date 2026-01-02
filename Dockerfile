@@ -33,6 +33,7 @@ RUN python3 -m pip install --break-system-packages git+https://github.com/phylet
 
 # Download example data and config file
 RUN git clone https://github.com/phyletica/ecoevolity-example-data.git
+RUN git clone https://github.com/joaks1/phycoeval-example-data.git
 
 # Let's give it a spin
 # RUN cd ecoevolity-example-data && \
