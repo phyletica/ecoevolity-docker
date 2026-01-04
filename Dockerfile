@@ -6,6 +6,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update -y -q && \
     apt-get install -y -q \
         build-essential \
+        bash-completion \
         git \
         cmake \
         python3 \
